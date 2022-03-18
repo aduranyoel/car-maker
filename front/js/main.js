@@ -6,7 +6,7 @@ let carsLoaded = {}, currentChassis = document.querySelector('#chassis');
 
 const COLORS_NAME = ['369369369499', '477477479499', '370449485499', '436475499499', '403424397499', '409387419499', '494389399499', '490433397499', '540499411499', '389374374499'];
 
-window.onload = () => {
+window.onload = () => setTimeout(() => {
     colors.innerHTML = COLORS_NAME.map(color => `<div><img data-color="${ color }" src="./img/colors/${ color }.png" alt=""></div>`).join``;
     carsLoaded = COLORS_NAME.reduce((acc, color) => {
         const img = document.createElement('img');
@@ -16,7 +16,7 @@ window.onload = () => {
         return acc;
     }, {});
     carContainer.classList.remove('loading');
-}
+}, 1000);
 
 colors.addEventListener('click', e => {
     const selected = e.target;
