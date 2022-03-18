@@ -15,6 +15,7 @@ window.onload = () => {
         acc[color] = img;
         return acc;
     }, {});
+    carContainer.classList.remove('loading');
 }
 
 colors.addEventListener('click', e => {
