@@ -24,8 +24,6 @@
 .car-container {
     position: relative;
     height: 100%;
-    opacity: 1;
-    transition: opacity 1s var(--animation);
 }
 
 @media print {
@@ -37,10 +35,6 @@
         top: 0;
         left: 0;
     }
-}
-
-.car-container.loading {
-    opacity: 0;
 }
 
 .car-container img {
