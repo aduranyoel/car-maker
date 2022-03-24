@@ -64,8 +64,6 @@
     grid-template-columns: repeat(2, 1fr);
 }
 .options .colors {
-    /*disable event temporarily*/
-    pointer-events: none;
     display: grid;
     grid-template-columns: repeat(5, 50px);
     grid-template-rows: repeat(2, 40px);

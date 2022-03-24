@@ -6,7 +6,6 @@ const
     skinElement = document.querySelector('#skin'),
     wheelLeftElement = document.querySelector('#wheel-left'),
     wheelRightElement = document.querySelector('#wheel-right'),
-    chassisElement = document.querySelector('#chassis'),
 
     COLORS_NAME = [
         '477477479499', '369369369499',
@@ -52,13 +51,13 @@ const
         { top: 0, left: 0 }, // empty
     ];
 
-let
+let colorsLoaded = {},
     tires = [],
     skin = [],
     wheelLeft = [],
     wheelRight = [],
     chassis = [],
-    currentChassis = document.querySelector('#chassis'),
+    chassisElement = document.querySelector('#chassis'),
     isGrabbing = false, position = 1, grabBegin = 0, lastRange = 0, lastClientX = 0;
 
 class Wheel {
@@ -75,7 +74,7 @@ window.onload = () => {
         loadResource(getPictures.bind(this, 'tires')).then(res => tires = res),
         loadResource(getPictures.bind(this, 'chassis/skin')).then(res => skin = res),
         loadWheels(),
-        loadChassisColors(COLORS_NAME[0]).then(res => chassis = res),
+        loadChassisColors(COLORS_NAME[0]).then(() =>  colorsLoaded[COLORS_NAME[0]] = chassis),
     ]).then(pageReady).catch(console.error);
 }
 
@@ -109,7 +108,7 @@ function getPictures(url) {
 async function loadChassisColors(color) {
     try {
         const result = await loadResource(getPictures.bind(this, `chassis/${ color }`))
-        return result.map(img => {
+        chassis = result.map(img => {
             img.setAttribute('data-color', color);
             return img;
         })
@@ -164,11 +163,21 @@ function setCarPosition(position) {
     chassisElement.src = chassis[position].src
 }
 
-function pageReady() {
-    setCarPosition(position);
+function loaderStart() {
+    document.body.classList.add('loading');
+    document.querySelector('.loader').style.opacity = '1';
+    document.querySelector('.lds-ripple').style.display = '';
+}
+
+function loaderEnd() {
     document.querySelector('.loader').style.opacity = '0';
     document.querySelector('.lds-ripple').style.display = 'none';
     setTimeout(() => document.body.classList.remove('loading'), 1000);
+}
+
+function pageReady() {
+    setCarPosition(position);
+    loaderEnd();
 }
 
 function grabStart({ clientX }) {
@@ -204,17 +213,24 @@ document.addEventListener('mousemove', ({ clientX }) => {
     setCarPosition(position);
 })
 
-colors.addEventListener('click', e => {
+colors.addEventListener('click', async(e) => {
     const selected = e.target;
     const newColor = selected.getAttribute('data-color');
-    const currentColor = currentChassis.getAttribute('data-color');
+    const currentColor = chassisElement.getAttribute('data-color');
 
     if (!newColor || currentColor === newColor) return;
 
-    const clone = currentChassis.cloneNode(true);
-    carContainer.removeChild(currentChassis);
-    currentChassis = carsLoaded[newColor];
-    carContainer.appendChild(currentChassis);
+    if(colorsLoaded[newColor]) {
+        chassis = colorsLoaded[newColor];
+    } else {
+        await loadChassisColors(newColor);
+        colorsLoaded[newColor] = chassis;
+    }
+
+    const clone = chassisElement.cloneNode(true);
+    carContainer.removeChild(chassisElement);
+    chassisElement = chassis[position].cloneNode(true);
+    carContainer.appendChild(chassisElement);
     carContainer.appendChild(clone);
 
     setTimeout(() => clone.style.opacity = '0')
